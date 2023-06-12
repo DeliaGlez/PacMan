@@ -35,11 +35,12 @@ public class Ventana extends JFrame {
 	Timer timer ;
 	Random r;
 
-	
+	int contadorPastillas;
     int segundos = 0;
     String tiempoFormateado;
     ImageIcon pacmanIcon;
     JLabel lblTiempo= new JLabel("00:00:00");
+    JLabel contador;
 	int[][] laberinto = {
     {1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,	0,	0,	0,	1,	4,	4,	4,	4,	4,	4,	1,	0,	0,	0,	0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1},
 {1,	0,	0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1},
@@ -108,7 +109,7 @@ public class Ventana extends JFrame {
 	
 	public Ventana() {
 		r = new Random();
-	
+	    contadorPastillas=0;
 		timer = new Timer();
 		segundos = 0;
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -197,6 +198,8 @@ public class Ventana extends JFrame {
 				for (int i=0;i<pastillas.size();i++) {
 					if (pastillas.get(i).colision(new Pastilla(x, y, 30, 30, Color.blue))) {
                         pastillas.remove(pastillas.get(i));
+                        contadorPastillas++;
+                        contador.setText("Score:"+contadorPastillas);
                         repaint();
 			           
 			        }
@@ -225,12 +228,10 @@ public class Ventana extends JFrame {
                         
 			        }
 				}
-				/* 
-				if (win.colision(new Rect(x, y, 10, 10, Color.blue))) {
+				
+				if (contadorPastillas==114) {
 					timer.cancel();
-					JOptionPane.showMessageDialog(null, "Tu tiempo fue de: " + tiempoFormateado, "Pasaste!", 1, null);
-					rectangulos.clear();
-					
+					JOptionPane.showMessageDialog(null, "Tu tiempo fue de: " + tiempoFormateado, "Pasaste!", 1, null);	
 					timer = new Timer(); // nuevo timer para nuevo mapa
 					segundos = 0;
 			        timer.scheduleAtFixedRate(new TimerTask() {
@@ -242,11 +243,25 @@ public class Ventana extends JFrame {
 			        x=10;
 			        y=10;
 			        
-					
+					contadorPastillas=0;
+                    contador.setText("Score:"+contadorPastillas);
+                        
+                    pastillas.clear();
+                    for (int fila=0;fila<60;fila++) {
+                            for(int columna=0;columna<60;columna++) {
+                                if (laberinto[fila][columna]==3) { // si hay un uno en la matriz
+                                    //g.setColor(Color.DARK_GRAY);
+                                    
+                                    Pastilla pastilla=new Pastilla(columna*10,fila*10);
+                                    //g.fillRect(prueba.x, prueba.y, prueba.w,prueba.h);
+                                    pastillas.add(pastilla);
+                                }
+                            }
+                        }
 					
 					repaint();
 					
-				}*/
+				}
 				juego.repaint();	
 			}
 			
@@ -262,17 +277,17 @@ public class Ventana extends JFrame {
 		
 		
 		JPanel panel= new JPanel();
-		panel.setBackground(Color.decode("#acbfb7"));
+		panel.setBackground(Color.white);
 		panel.setLayout(new FlowLayout());
 		
 		JPanel panel2= new JPanel();
-		panel2.setBackground(Color.decode("#acbfb7"));
-		panel2.setLayout(new FlowLayout());
+		panel2.setBackground(Color.decode("#030303"));
+		panel2.setLayout(new FlowLayout(0,200,0));
 		lblTiempo.setFont((new Font("Century Gothic", Font.BOLD, 20)));
 		lblTiempo.setForeground(Color.white);
 		
 		JButton btn1= new JButton("Reiniciar");
-		btn1.setBackground(Color.decode("#8a8780"));
+		btn1.setBackground(Color.decode("#030303"));
 		btn1.setFont((new Font("Century Gothic", Font.BOLD, 20)));
 		btn1.setForeground(Color.white);
 		btn1.addActionListener(new ActionListener() {
@@ -293,6 +308,10 @@ public class Ventana extends JFrame {
 				
 		        tiempoFormateado = String.format("%02d:%02d:%02d", horas, minutos, segundosRestantes);
 		        lblTiempo.setText(tiempoFormateado);
+                
+                contadorPastillas=0;
+                contador.setText("Score:"+contadorPastillas);
+                
 		       pastillas.clear();
                for (int fila=0;fila<60;fila++) {
 					for(int columna=0;columna<60;columna++) {
@@ -315,9 +334,16 @@ public class Ventana extends JFrame {
 		});
 		
 		panel.add(btn1);
+
 		this.add(panel,BorderLayout.SOUTH);
 		lblTiempo.setBackground(Color.decode("#acbfb7"));
 		panel2.add(lblTiempo);
+
+        contador= new JLabel("Score:"+contadorPastillas);
+        contador.setFont((new Font("Century Gothic", Font.BOLD, 20)));
+		contador.setForeground(Color.white);
+        panel2.add(contador);
+        
 		this.add(panel2,BorderLayout.NORTH);
 		
 		juego.setFocusable(true);
